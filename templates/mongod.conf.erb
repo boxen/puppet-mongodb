@@ -1,0 +1,4 @@
+bind_ip = 127.0.0.1
+dbpath  = <%= scope.lookupvar "mongodb::config::datadir" %>
+logpath = <%= scope.lookupvar "mongodb::config::logfile" %>
+port    = <%= scope.lookupvar "mongodb::config::port" %>

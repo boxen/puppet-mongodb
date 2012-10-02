@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<plist version="1.0">
+  <dict>
+    <key>Label</key>
+    <string>com.setup.mongodb</string>
+
+    <key>GitHub</key>
+    <dict>
+      <key>Description</key>
+      <string>A schemaless document-oriented database.</string>
+
+      <key>Port</key>
+      <integer><%= scope.lookupvar "mongodb::config::port" %></integer>
+    </dict>
+
+    <key>ProgramArguments</key>
+    <array>
+      <string><%= scope.lookupvar "mongodb::config::executable" %></string>
+      <string>run</string>
+      <string>--config</string>
+      <string><%= scope.lookupvar "mongodb::config::configfile" %></string>
+    </array>
+
+    <key>RunAtLoad</key>
+    <true />
+
+    <key>KeepAlive</key>
+    <true />
+
+    <key>UserName</key>
+    <string><%= scope.lookupvar "::luser" %></string>
+
+    <key>WorkingDirectory</key>
+    <string><%= scope.lookupvar "mongodb::config::datadir" %></string>
+
+    <key>StandardErrorPath</key>
+    <string><%= scope.lookupvar "mongodb::config::consolefile" %></string>
+
+    <key>StandardOutPath</key>
+    <string><%= scope.lookupvar "mongodb::config::consolefile" %></string>
+  </dict>
+</plist>
