@@ -1,16 +1,16 @@
 class mongodb::service {
-  file { '/Library/LaunchDaemons/com.setup.mongodb.plist':
-    content => template('mongodb/com.setup.mongodb.plist.erb'),
+  file { '/Library/LaunchDaemons/com.boxen.mongodb.plist':
+    content => template('mongodb/com.boxen.mongodb.plist.erb'),
     group   => 'wheel',
-    notify  => Service['com.setup.mongodb'],
+    notify  => Service['com.boxen.mongodb'],
     owner   => 'root',
   }
 
-  service { 'com.setup.mongodb':
+  service { 'com.boxen.mongodb':
     ensure  => running,
     require => [
       Package['mongodb'],
-      File['/Library/LaunchDaemons/com.setup.mongodb.plist']
+      File['/Library/LaunchDaemons/com.boxen.mongodb.plist']
     ]
   }
 }
