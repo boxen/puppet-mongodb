@@ -16,7 +16,7 @@ class mongodb::config {
 
   file { $configfile:
     content => template('mongodb/mongod.conf.erb'),
-    notify  => Service['com.boxen.mongodb']
+    notify  => Service['dev.mongodb']
   }
 
 

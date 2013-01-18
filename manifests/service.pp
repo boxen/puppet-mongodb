@@ -1,16 +1,21 @@
 class mongodb::service {
-  file { '/Library/LaunchDaemons/com.boxen.mongodb.plist':
-    content => template('mongodb/com.boxen.mongodb.plist.erb'),
+  file { '/Library/LaunchDaemons/dev.mongodb.plist':
+    content => template('mongodb/dev.mongodb.plist.erb'),
     group   => 'wheel',
-    notify  => Service['com.boxen.mongodb'],
+    notify  => Service['dev.mongodb'],
     owner   => 'root',
   }
 
-  service { 'com.boxen.mongodb':
+  service { 'dev.mongodb':
     ensure  => running,
     require => [
       Package['mongodb'],
-      File['/Library/LaunchDaemons/com.boxen.mongodb.plist']
+      File['/Library/LaunchDaemons/dev.mongodb.plist']
     ]
+  }
+
+  service { 'com.boxen.mongodb': # replaced by dev.mongodb
+    before => Service['dev.mongodb'],
+    enable => false
   }
 }

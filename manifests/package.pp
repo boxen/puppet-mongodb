@@ -1,5 +1,5 @@
 class mongodb::package {
   package { 'mongodb':
-    notify => Service['com.boxen.mongodb']
+    notify => Service['dev.mongodb']
   }
 }
