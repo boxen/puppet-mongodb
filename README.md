@@ -2,7 +2,7 @@
 
 Requires the following boxen modules:
 
-* `boxen`
+* [boxen](https://github.com/boxen/puppet-boxen)
 
 ## Usage
 
