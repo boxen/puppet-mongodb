@@ -26,6 +26,7 @@ class mongodb {
   }
 
   package { 'boxen/brews/mongodb':
+    alias  => 'mongodb',
     ensure => '2.2.2-boxen1',
     notify => Service['dev.mongodb']
   }
