@@ -26,7 +26,6 @@ class mongodb {
   }
 
   package { 'boxen/brews/mongodb':
-    alias  => 'mongodb',
     ensure => '2.2.2-boxen1',
     notify => Service['dev.mongodb']
   }
@@ -40,10 +39,6 @@ class mongodb {
 
   service { 'dev.mongodb':
     ensure  => running,
-    require => [
-      Package['mongodb'],
-      File['/Library/LaunchDaemons/dev.mongodb.plist']
-    ]
   }
 
   service { 'com.boxen.mongodb': # replaced by dev.mongodb
