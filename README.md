@@ -1,16 +1,18 @@
 # MongoDB Puppet Module for Boxen
 
-Requires the following boxen modules:
-
-* [boxen](https://github.com/boxen/puppet-boxen)
-
 ## Usage
 
 ```puppet
 include mongodb
 ```
 
-### Environment
+## Required Pupept Modules
+
+* boxen
+* homebrew
+* stdlib
+
+## Environment
 
 Once installed, you can access the following variables in your environment, projects, etc:
 

@@ -1,6 +1,6 @@
 class mongodb {
-  require mongodb::config
-  require homebrew
+  include mongodb::config
+  include homebrew
 
   file { [
     $mongodb::config::configdir,
