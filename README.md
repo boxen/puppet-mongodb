@@ -16,7 +16,7 @@ include mongodb
 
 Once installed, you can access the following variables in your environment, projects, etc:
 
-* BOXEN_MONGODB_PORT: the configured redis port
+* BOXEN_MONGODB_PORT: the configured mongodb port
 * BOXEN_MONGODB_URL: the URL for mongodb, including localhost & port
 
 ### Ruby
