@@ -6,7 +6,7 @@
 include mongodb
 ```
 
-## Required Pupept Modules
+## Required Puppet Modules
 
 * boxen
 * homebrew
