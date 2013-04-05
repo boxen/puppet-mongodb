@@ -1,5 +1,7 @@
 # MongoDB Puppet Module for Boxen
 
+[![Build Status](https://travis-ci.org/boxen/puppet-mongodb.png)](https://travis-ci.org/boxen/puppet-mongodb)
+
 ## Usage
 
 ```puppet
