@@ -1,3 +1,8 @@
+# Public: Install MongoDB.
+#
+# Examples
+#
+#   include mongodb
 class mongodb {
   include mongodb::config
   include homebrew
