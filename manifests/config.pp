@@ -1,3 +1,8 @@
+# Internal: Configuration settings for MongoDB.
+#
+# Examples
+#
+#   include mongodb::config
 class mongodb::config {
   require boxen::config
 
