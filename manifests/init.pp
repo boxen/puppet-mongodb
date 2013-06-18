@@ -31,7 +31,7 @@ class mongodb {
   }
 
   package { 'boxen/brews/mongodb':
-    ensure => '2.4.2-boxen1',
+    ensure => '2.4.4-boxen1',
     notify => Service['dev.mongodb']
   }
 
