@@ -3,7 +3,14 @@
 # Examples
 #
 #   include mongodb
-class mongodb {
+# 
+# with default port:
+# 
+#   class { 'mongodb': 
+#     port => 27017
+#   }
+# 
+class mongodb($port = 17017) {
   include mongodb::config
   include homebrew
 

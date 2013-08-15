@@ -13,5 +13,4 @@ class mongodb::config {
   $logdir      = "${boxen::config::logdir}/mongodb"
   $logfile     = "${logdir}/mongodb.log"
   $consolefile = "${logdir}/console.log"
-  $port        = 17017
 }
