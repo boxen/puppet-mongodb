@@ -3,24 +3,27 @@
 <plist version="1.0">
   <dict>
     <key>Label</key>
-    <string>dev.mongodb</string>
+    <string><%= @service %></string>
 
     <key>Boxen</key>
     <dict>
       <key>Description</key>
       <string>A schemaless document-oriented database.</string>
 
+      <key>Host</key>
+      <string><%= @host %></string>
+
       <key>Port</key>
-      <integer><%= scope.lookupvar "mongodb::config::port" %></integer>
+      <integer><%= @port %></integer>
     </dict>
 
     <key>ProgramArguments</key>
     <array>
-      <string><%= scope.lookupvar "mongodb::config::executable" %></string>
+      <string><%= @executable %></string>
       <string>run</string>
       <string>--rest</string>
       <string>--config</string>
-      <string><%= scope.lookupvar "mongodb::config::configfile" %></string>
+      <string><%= @configdir %>/mongodb.conf</string>
     </array>
 
     <key>RunAtLoad</key>
@@ -30,16 +33,16 @@
     <true />
 
     <key>UserName</key>
-    <string><%= scope.lookupvar "::luser" %></string>
+    <string><%= scope.lookupvar "::boxen_user" %></string>
 
     <key>WorkingDirectory</key>
-    <string><%= scope.lookupvar "mongodb::config::datadir" %></string>
+    <string><%= @datadir %></string>
 
     <key>StandardErrorPath</key>
-    <string><%= scope.lookupvar "mongodb::config::consolefile" %></string>
+    <string><%= @logdir %>/console.log</string>
 
     <key>StandardOutPath</key>
-    <string><%= scope.lookupvar "mongodb::config::consolefile" %></string>
+    <string><%= @logdir %>/console.log</string>
     
     <key>HardResourceLimits</key>
     <dict>

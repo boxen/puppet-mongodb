@@ -1,17 +1,55 @@
-# Internal: Configuration settings for MongoDB.
-#
-# Examples
-#
-#   include mongodb::config
-class mongodb::config {
-  require boxen::config
+# Internal: Configuration files
+class mongodb::config(
+  $ensure     = $mongodb::params::ensure,
 
-  $configdir   = "${boxen::config::configdir}/mongodb"
-  $configfile  = "${configdir}/mongod.conf"
-  $datadir     = "${boxen::config::datadir}/mongodb"
-  $executable  = "${boxen::config::homebrewdir}/bin/mongod"
-  $logdir      = "${boxen::config::logdir}/mongodb"
-  $logfile     = "${logdir}/mongodb.log"
-  $consolefile = "${logdir}/console.log"
-  $port        = 17017
+  $executable = $mongodb::params::executable,
+
+  $configdir  = $mongodb::params::configdir,
+  $datadir    = $mongodb::params::datadir,
+  $logdir     = $mongodb::params::logdir,
+
+  $host       = $mongodb::params::host,
+  $port       = $mongodb::params::port,
+
+  $service    = $mongodb::params::service,
+) inherits mongodb::params {
+
+  $dir_ensure = $ensure ? {
+    present => directory,
+    default => absent,
+  }
+
+  file {
+    [
+      $configdir,
+      $datadir,
+      $logdir,
+    ]:
+      ensure  => $dir_ensure;
+
+    "${configdir}/mongodb.conf":
+      ensure  => $ensure,
+      content => template('mongodb/mongod.conf.erb') ;
+  }
+
+  if $::operatingsystem == 'Darwin' {
+    include boxen::config
+
+    file {
+      "${boxen::config::envdir}/mongodb.sh":
+        ensure  => absent ;
+
+      "/Library/LaunchDaemons/${service}.plist":
+        ensure  => $ensure,
+        content => template('mongodb/dev.mongodb.plist.erb'),
+        group   => 'wheel',
+        owner   => 'root' ;
+    }
+
+    boxen::env_script { 'mongodb':
+      ensure   => $ensure,
+      content  => template('mongodb/env.sh.erb'),
+      priority => 'lower',
+    }
+  }
 }

@@ -3,51 +3,53 @@
 # Examples
 #
 #   include mongodb
-class mongodb {
-  include mongodb::config
-  include homebrew
+class mongodb(
+  $ensure     = $mongodb::params::ensure,
 
-  file { [
-    $mongodb::config::configdir,
-    $mongodb::config::datadir,
-    $mongodb::config::logdir
-  ]:
-    ensure  => directory,
+  $executable = $mongodb::params::executable,
+
+  $configdir  = $mongodb::params::configdir,
+  $datadir    = $mongodb::params::datadir,
+  $logdir     = $mongodb::params::logdir,
+
+  $host       = $mongodb::params::host,
+  $port       = $mongodb::params::port,
+
+  $package    = $mongodb::params::package,
+  $version    = $mongodb::params::version,
+
+  $service    = $mongodb::params::service,
+  $enable     = $mongodb::params::enable,
+) inherits mongodb::params {
+
+  class { 'mongodb::config':
+    ensure     => $ensure,
+
+    executable => $executable,
+
+    configdir  => $configdir,
+    datadir    => $datadir,
+    logdir     => $logdir,
+
+    host       => $host,
+    port       => $port,
+
+    service    => $service,
   }
 
-  file { $mongodb::config::configfile:
-    content => template('mongodb/mongod.conf.erb'),
-    notify  => Service['dev.mongodb']
+  ~>
+  class { 'mongodb::package':
+    ensure  => $ensure,
+
+    package => $package,
+    version => $version,
   }
 
+  ~>
+  class { 'mongodb::service':
+    ensure  => $ensure,
 
-  file { "${boxen::config::envdir}/mongodb.sh":
-    content => template('mongodb/env.sh.erb'),
-    require => File[$boxen::config::envdir]
-  }
-
-  homebrew::formula { 'mongodb':
-    before => Package['boxen/brews/mongodb']
-  }
-
-  package { 'boxen/brews/mongodb':
-    ensure => '2.4.4-boxen1',
-    notify => Service['dev.mongodb']
-  }
-
-  file { '/Library/LaunchDaemons/dev.mongodb.plist':
-    content => template('mongodb/dev.mongodb.plist.erb'),
-    group   => 'wheel',
-    notify  => Service['dev.mongodb'],
-    owner   => 'root',
-  }
-
-  service { 'dev.mongodb':
-    ensure  => running,
-  }
-
-  service { 'com.boxen.mongodb': # replaced by dev.mongodb
-    before => Service['dev.mongodb'],
-    enable => false
+    service => $service,
+    enable  => $enable,
   }
 }

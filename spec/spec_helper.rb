@@ -6,3 +6,12 @@ RSpec.configure do |c|
   c.module_path = File.join(fixture_path, 'modules')
   c.manifest_dir = File.join(fixture_path, 'manifests')
 end
+
+def default_test_facts
+  {
+    :boxen_home      => "/test/boxen",
+    :boxen_user      => "testuser",
+    :ipaddress_lo0   => "127.0.0.1",
+    :operatingsystem => "Darwin",
+  }
+end
