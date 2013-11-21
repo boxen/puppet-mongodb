@@ -1,21 +1,11 @@
-require 'spec_helper'
+require "spec_helper"
 
-describe 'mongodb' do
-  let(:facts) do
-    {
-      :boxen_home => '/opt/boxen',
-      :boxen_user => 'testuser',
-    }
-  end
+describe "mongodb" do
+  let(:facts) { default_test_facts }
 
   it do
-    should include_class('mongodb::config')
-    should include_class('homebrew')
-
-    should contain_homebrew__formula('mongodb')
-
-    should contain_package('boxen/brews/mongodb')
-
-    should contain_service('dev.mongodb').with(:ensure => 'running')
+    should contain_class("mongodb::config")
+    should contain_class("mongodb::package")
+    should contain_class("mongodb::service")
   end
 end
