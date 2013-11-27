@@ -22,6 +22,7 @@ class mongodb::service(
   service { $service:
     ensure => $svc_ensure,
     enable => $enable,
+    alias  => 'mongodb',
   }
 
 }

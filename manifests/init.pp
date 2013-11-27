@@ -35,6 +35,8 @@ class mongodb(
     port       => $port,
 
     service    => $service,
+
+    notify     => Service['mongodb'],
   }
 
   ~>
