@@ -8,6 +8,15 @@ describe "mongodb::service" do
     should contain_service("dev.mongodb").with_ensure(:running)
   end
 
+  context "ensure absent" do
+    let(:params) { { :ensure => 'absent' } }
+
+    it do
+      should contain_service("com.boxen.mongodb").with_ensure(:stopped)
+      should contain_service("dev.mongodb").with_ensure(:stopped)
+    end
+  end
+
   context "Ubuntu" do
     let(:facts) { default_test_facts.merge(:operatingsystem => "Ubuntu") }
 

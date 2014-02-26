@@ -8,7 +8,7 @@ class mongodb::service(
 
   $svc_ensure = $ensure ? {
     present => running,
-    default => absent,
+    default => stopped,
   }
 
   if $::operatingsystem == 'Darwin' {
