@@ -4,7 +4,6 @@ class Mongodb < Formula
   homepage "http://www.mongodb.org/"
   url "http://downloads.mongodb.org/src/mongodb-src-r2.6.0.tar.gz"
   sha1 "35f8efe61d992f4b71c9205a9dbcab50e745c9a3"
-  revision 1
 
   version '2.6.0-boxen1'
 
