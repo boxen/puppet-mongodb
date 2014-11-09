@@ -1,76 +1,104 @@
-require 'formula'
+require "formula"
 
 class Mongodb < Formula
-  homepage "http://www.mongodb.org/"
-  url "http://downloads.mongodb.org/src/mongodb-src-r2.6.1.tar.gz"
-  sha1 "3e069329e93a45f14bb86618eceea08d376dbc82"
+  homepage "https://www.mongodb.org/"
 
-  version '2.6.1-boxen1'
+  stable do
+    url "https://fastdl.mongodb.org/src/mongodb-src-r2.6.5.tar.gz"
+    sha1 "f5a68505a0de1152b534d62a8f0147d258d503a0"
+
+    # Review this patch with the next stable release.
+    # Note it is a different patch to the one applied to all builds further below.
+    # This is already fixed in the devel & HEAD builds.
+    if MacOS.version == :yosemite
+      patch do
+        url "https://github.com/mongodb/mongo/commit/759b6e8.diff"
+        sha1 "63d901ac81681fbe8b92dc918954b247990ab2fb"
+      end
+    end
+  end
+
+  version '2.6.5-boxen1'
 
   bottle do
-    sha1 "1c7b447ae2077b9efeaee2aa2c2474dc6b19ab6f" => :mavericks
-    sha1 "0004e3bfb60db586f6ced02769ccd1cf325e0929" => :mountain_lion
-    sha1 "7667f6cc36859fb9fced1885f382b76ae325583c" => :lion
+    revision 2
+    sha1 "e6da509908fdacf9eb0f16e850e0516cd0898072" => :yosemite
+    sha1 "5ab96fe864e725461eea856e138417994f50bb32" => :mavericks
+    sha1 "193e639b7b79fbb18cb2e0a6bbabfbc9b8cbc042" => :mountain_lion
   end
 
-  head do
-    url "https://github.com/mongodb/mongo.git"
+  devel do
+    url "https://fastdl.mongodb.org/src/mongodb-src-r2.7.7.tar.gz"
+    sha1 "ce223f5793bdf5b3e1420b0ede2f2403e9f94e5a"
+
+    # Remove this with the next devel release. Already merged in HEAD.
+    # https://github.com/mongodb/mongo/commit/8b8e90fb
+    patch do
+      url "https://github.com/mongodb/mongo/commit/8b8e90fb.diff"
+      sha1 "9f9ce609c7692930976690cae68aa4fce1f8bca3"
+    end
   end
+
+  # HEAD is currently failing. See https://jira.mongodb.org/browse/SERVER-15555
+  head "https://github.com/mongodb/mongo.git"
 
   option "with-boost", "Compile using installed boost, not the version shipped with mongodb"
-  depends_on "boost" => :optional
 
+  depends_on "boost" => :optional
+  depends_on :macos => :snow_leopard
   depends_on "scons" => :build
   depends_on "openssl" => :optional
 
-  def install
-    args = ["--prefix=#{prefix}", "-j#{ENV.make_jobs}"]
-
-    cxx = ENV.cxx
-    if ENV.compiler == :clang && MacOS.version >= :mavericks
-      # when building on Mavericks with libc++
-      # Use --osx-version-min=10.9 such that the compiler defaults to libc++.
-      # Upstream issue discussing the default flags:
-      # https://jira.mongodb.org/browse/SERVER-12682
-      args << "--osx-version-min=10.9"
+  # Review this patch with each release.
+  # This modifies the SConstruct file to include 10.10 as an accepted build option.
+  if MacOS.version == :yosemite
+    patch do
+      url "https://raw.githubusercontent.com/DomT4/scripts/fbc0cda/Homebrew_Resources/Mongodb/mongoyosemite.diff"
+      sha1 "f4824e93962154aad375eb29527b3137d07f358c"
     end
+  end
 
-    args << '--64' if MacOS.prefer_64_bit?
-    args << "--cc=#{ENV.cc}"
-    args << "--cxx=#{cxx}"
+  def install
+    args = %W[
+      --prefix=#{prefix}
+      -j#{ENV.make_jobs}
+      --cc=#{ENV.cc}
+      --cxx=#{ENV.cxx}
+      --osx-version-min=#{MacOS.version}
+    ]
 
     # --full installs development headers and client library, not just binaries
-    args << "--full"
+    # (only supported pre-2.7)
+    args << "--full" if build.stable?
     args << "--use-system-boost" if build.with? "boost"
+    args << "--64" if MacOS.prefer_64_bit?
 
-    if build.with? 'openssl'
-      args << '--ssl'
-      args << "--extrapath=#{Formula["openssl"].opt_prefix}"
+    if build.with? "openssl"
+      args << "--ssl" << "--extrapath=#{Formula["openssl"].opt_prefix}"
     end
 
-    scons 'install', *args
+    scons "install", *args
 
     (buildpath+"mongod.conf").write mongodb_conf
     etc.install "mongod.conf"
 
-    (var+'mongodb').mkpath
-    (var+'log/mongodb').mkpath
+    (var+"mongodb").mkpath
+    (var+"log/mongodb").mkpath
   end
 
   def mongodb_conf; <<-EOS.undent
-    # Store data in #{var}/mongodb instead of the default /data/db
-    dbpath = #{var}/mongodb
-
-    # Append logs to #{var}/log/mongodb/mongo.log
-    logpath = #{var}/log/mongodb/mongo.log
-    logappend = true
-
-    # Only accept local connections
-    bind_ip = 127.0.0.1
+    systemLog:
+      destination: file
+      path: #{var}/log/mongodb/mongo.log
+      logAppend: true
+    storage:
+      dbPath: #{var}/mongodb
+    net:
+      bindIp: 127.0.0.1
     EOS
   end
 
   test do
-    system "#{bin}/mongod", '--sysinfo'
+    system "#{bin}/mongod", "--sysinfo"
   end
 end
