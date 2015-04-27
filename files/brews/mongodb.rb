@@ -67,6 +67,10 @@ class Mongodb < Formula
       --osx-version-min=#{MacOS.version}
     ]
 
+    # For Yosemite with Clang 3.5+ we need this to build Mongo pre 2.7.7
+    # See: https://github.com/mongodb/mongo/pull/956#issuecomment-94545753
+    args << "--disable-warnings-as-errors" if MacOS.version == :yosemite
+
     # --full installs development headers and client library, not just binaries
     # (only supported pre-2.7)
     args << "--full" if build.stable?
