@@ -1,38 +1,70 @@
-require "formula"
+require "language/go"
 
 class Mongodb < Formula
   homepage "https://www.mongodb.org/"
 
+  depends_on "go" => :build
   stable do
     url "https://fastdl.mongodb.org/src/mongodb-src-r3.0.2.tar.gz"
-    sha1 "c24c4deb619e199d5c3688370b39ea6e4a4df204"
-  end
-
-  version '3.0.2-boxen1'
-
-  bottle do
-    revision 2
-    sha1 "e6da509908fdacf9eb0f16e850e0516cd0898072" => :yosemite
-    sha1 "5ab96fe864e725461eea856e138417994f50bb32" => :mavericks
-    sha1 "193e639b7b79fbb18cb2e0a6bbabfbc9b8cbc042" => :mountain_lion
+    sha256 "010522203cdb9bbff52fbd9fe299b67686bb1256e2e55eb78abf35444f668399"
+    go_resource "github.com/mongodb/mongo-tools" do
+      url "https://github.com/mongodb/mongo-tools.git",
+        :tag => "r3.0.2",
+        :revision => "a914adfcea7d76f07512415eec5cd8308e67318e"
+    end
   end
 
   devel do
     url "https://fastdl.mongodb.org/src/mongodb-src-r3.1.1.tar.gz"
-    sha1 "a0d9ae6baa6034d5373b3ffe082a8fea5c14774f"
+    sha256 "4f983680ff1cc61d021daed2e2d24c54c069d965ec47276678296240d59efb6f"
+    go_resource "github.com/mongodb/mongo-tools" do
+      url "https://github.com/mongodb/mongo-tools.git",
+        :tag => "r3.1.1",
+        :revision => "6c959d3a8bd9704b5ee9e17e60a4236db6887dc3"
+    end
   end
 
-  # HEAD is currently failing. See https://jira.mongodb.org/browse/SERVER-15555
-  head "https://github.com/mongodb/mongo.git"
+  bottle do
+    cellar :any
+    revision 2
+    sha256 "25a97aa9a4b9d535120216b3960e0d34b75f86134c8f71127484140139f40fe7" => :yosemite
+    sha256 "de5f3e5be894da1c8884ab0ebb827890d3bb4c228066cb6ec2f22d993869bf21" => :mavericks
+    sha256 "6b565e5ba85d7deb8461dfcc34c4e5c07532a72f55d7c76af5b74fec84a153f1" => :mountain_lion
+  end
+
+  version '3.0.2-boxen1'
 
   option "with-boost", "Compile using installed boost, not the version shipped with mongodb"
 
   depends_on "boost" => :optional
+  depends_on "go" => :build
   depends_on :macos => :snow_leopard
   depends_on "scons" => :build
   depends_on "openssl" => :optional
 
   def install
+    ENV.libcxx if build.devel?
+
+    # New Go tools have their own build script but the server scons "install" target is still
+    # responsible for installing them.
+    Language::Go.stage_deps resources, buildpath/"src"
+
+    cd "src/github.com/mongodb/mongo-tools" do
+      args = %W[]
+      # Once https://github.com/mongodb/mongo-tools/issues/11 is fixed, also set CPATH.
+      # For now, use default include path
+      #
+      if build.with? "openssl"
+        args << "ssl"
+        ENV["LIBRARY_PATH"] = "#{Formula["openssl"].opt_prefix}/lib"
+        # ENV["CPATH"] = "#{Formula["openssl"].opt_prefix}/include"
+      end
+      system "./build.sh", *args
+    end
+
+    mkdir "src/mongo-tools"
+    cp Dir["src/github.com/mongodb/mongo-tools/bin/*"], "src/mongo-tools/"
+
     args = %W[
       --prefix=#{prefix}
       -j#{ENV.make_jobs}
@@ -41,10 +73,8 @@ class Mongodb < Formula
       --osx-version-min=#{MacOS.version}
     ]
 
-    # --full installs development headers and client library, not just binaries
-    # (only supported pre-2.7)
     args << "--use-system-boost" if build.with? "boost"
-    args << "--64" if MacOS.prefer_64_bit?
+    args << "--use-new-tools"
 
     if build.with? "openssl"
       args << "--ssl" << "--extrapath=#{Formula["openssl"].opt_prefix}"
