@@ -16,7 +16,7 @@ class mongodb::params {
       $port       = 17017
 
       $package    = 'boxen/brews/mongodb'
-      $version    = '3.0.2-boxen1'
+      $version    = '3.0.7-boxen1'
 
       $service    = 'dev.mongodb'
     }
