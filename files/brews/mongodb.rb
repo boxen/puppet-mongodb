@@ -4,25 +4,24 @@ class Mongodb < Formula
   homepage "https://www.mongodb.org/"
 
   stable do
-    url "https://fastdl.mongodb.org/src/mongodb-src-r3.0.2.tar.gz"
-    sha1 "c24c4deb619e199d5c3688370b39ea6e4a4df204"
+    url "https://fastdl.mongodb.org/src/mongodb-src-r3.2.0.tar.gz"
+    sha256 "c6dd1d1670b86cbf02a531ddf7a7cda8f138d8733acce33766f174bd1e5ab2ee"
   end
 
-  version '3.0.2-boxen1'
+  version '3.2.0-boxen1'
 
   bottle do
     revision 2
-    sha1 "e6da509908fdacf9eb0f16e850e0516cd0898072" => :yosemite
-    sha1 "5ab96fe864e725461eea856e138417994f50bb32" => :mavericks
-    sha1 "193e639b7b79fbb18cb2e0a6bbabfbc9b8cbc042" => :mountain_lion
+    sha256 "0dde2411b7dc3ca802449ef276e3d5729aa617b4b7c1fe5712052c1d8f03f28e" => :el_capitan
+    sha256 "a7b91ff62121d66ca77053c9d63234b35993761e620399bd245c8109b9c8f96d" => :yosemite
+    sha256 "65d09370cff5f3c120ec91c8aef44f7bd42bd3184ca187e814c59a2750823558" => :mavericks
   end
 
   devel do
-    url "https://fastdl.mongodb.org/src/mongodb-src-r3.1.1.tar.gz"
-    sha1 "a0d9ae6baa6034d5373b3ffe082a8fea5c14774f"
+    url "http://downloads.mongodb.org/osx/mongodb-osx-x86_64-3.0.8-rc0.tgz"
+    sha256 "7a54d48d07fed6216aba10b55c42c804c742790b59057a3d14455e9e99007516"
   end
 
-  # HEAD is currently failing. See https://jira.mongodb.org/browse/SERVER-15555
   head "https://github.com/mongodb/mongo.git"
 
   option "with-boost", "Compile using installed boost, not the version shipped with mongodb"
@@ -45,6 +44,7 @@ class Mongodb < Formula
     # (only supported pre-2.7)
     args << "--use-system-boost" if build.with? "boost"
     args << "--64" if MacOS.prefer_64_bit?
+    args << "--disable-warnings-as-errors" if MacOS.version >= :yosemite
 
     if build.with? "openssl"
       args << "--ssl" << "--extrapath=#{Formula["openssl"].opt_prefix}"
