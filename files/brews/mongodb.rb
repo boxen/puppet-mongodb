@@ -7,6 +7,12 @@ class Mongodb < Formula
   stable do
     url "https://fastdl.mongodb.org/src/mongodb-src-r3.2.0.tar.gz"
     sha256 "c6dd1d1670b86cbf02a531ddf7a7cda8f138d8733acce33766f174bd1e5ab2ee"
+
+    go_resource "github.com/mongodb/mongo-tools" do
+      url "https://github.com/mongodb/mongo-tools.git",
+        :tag => "r3.2.0",
+        :revision => "6186100ad0500c122a56f0a0e28ce1227ca4fc88"
+    end
   end
 
   version '3.2.0-boxen1'
