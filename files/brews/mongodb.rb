@@ -1,4 +1,5 @@
 require "formula"
+require "language/go"
 
 class Mongodb < Formula
   homepage "https://www.mongodb.org/"
@@ -26,12 +27,36 @@ class Mongodb < Formula
 
   option "with-boost", "Compile using installed boost, not the version shipped with mongodb"
 
+  depends_on "go" => :build
   depends_on "scons" => :build
   depends_on "boost" => :optional
   depends_on "openssl" => :optional
   depends_on :macos => :mavericks
 
   def install
+    # Updates from https://github.com/Homebrew/homebrew/blob/master/Library/Formula/mongodb.rb
+
+    # New Go tools have their own build script but the server scons "install" target is still
+    # responsible for installing them.
+    Language::Go.stage_deps resources, buildpath/"src"
+
+    cd "src/github.com/mongodb/mongo-tools" do
+      # https://github.com/Homebrew/homebrew/issues/40136
+      inreplace "build.sh", '-ldflags "-X github.com/mongodb/mongo-tools/common/options.Gitspec `git rev-parse HEAD`"', ""
+
+      args = %W[]
+
+      if build.with? "openssl"
+        args << "ssl"
+        ENV["LIBRARY_PATH"] = "#{Formula["openssl"].opt_prefix}/lib"
+        ENV["CPATH"] = "#{Formula["openssl"].opt_prefix}/include"
+      end
+      system "./build.sh", *args
+    end
+
+    mkdir "src/mongo-tools"
+    cp Dir["src/github.com/mongodb/mongo-tools/bin/*"], "src/mongo-tools/"
+
     args = %W[
       --prefix=#{prefix}
       -j#{ENV.make_jobs}
