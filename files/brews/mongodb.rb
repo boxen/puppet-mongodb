@@ -26,24 +26,24 @@ class Mongodb < Formula
 
   option "with-boost", "Compile using installed boost, not the version shipped with mongodb"
 
-  depends_on "boost" => :optional
-  depends_on :macos => :snow_leopard
   depends_on "scons" => :build
+  depends_on "boost" => :optional
   depends_on "openssl" => :optional
+  depends_on :macos => :mavericks
 
   def install
     args = %W[
       --prefix=#{prefix}
       -j#{ENV.make_jobs}
-      --cc=#{ENV.cc}
-      --cxx=#{ENV.cxx}
       --osx-version-min=#{MacOS.version}
     ]
 
-    # --full installs development headers and client library, not just binaries
-    # (only supported pre-2.7)
+    args << "CC=#{ENV.cc}"
+    args << "CXX=#{ENV.cxx}"
+
+    args << "--use-sasl-client" if build.with? "sasl"
     args << "--use-system-boost" if build.with? "boost"
-    args << "--64" if MacOS.prefer_64_bit?
+    args << "--use-new-tools"
     args << "--disable-warnings-as-errors" if MacOS.version >= :yosemite
 
     if build.with? "openssl"
